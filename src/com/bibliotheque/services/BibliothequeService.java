@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class BibliothequeService {
     private List<Livre> livres = new ArrayList<>();
-    private Map<String, Utilisateur> utilisateurs = new HashMap<>(); //pour associer un mail à un utilisateur
-    private Map<Livre, Utilisateur> emprunts = new HashMap<>();//pour associer un livre à un utilisateur 
+    private Map<String, Utilisateur> utilisateurs = new HashMap<>();
+    private Map<Livre, Utilisateur> emprunts = new HashMap<>();
 
     public void ajouterLivre(Livre livre) {
         livres.add(livre);
@@ -42,17 +42,46 @@ public class BibliothequeService {
         return resultats;
     }
 
-    public boolean emprunterLivre(String nomUtilisateur, String prenomUtilisateur, String emailUtilisateur, Livre livreUtilisateur) {
-        if (!livreUtilisateur.isDisponible()) return false;
-        utilisateurs.putIfAbsent(nomUtilisateur, new Utilisateur(nomUtilisateur, prenomUtilisateur, emailUtilisateur));
-        Utilisateur utilisateur = utilisateurs.get(emailUtilisateur);
-        if(!utilisateur.getEmprunts().contains(livreUtilisateur)) {
-        	utilisateur.ajouterEmprunt(livreUtilisateur);
-        	emprunts.put(livreUtilisateur, utilisateur);
-        	livreUtilisateur.setDisponible(false);
-        	return true;
+    public List<Livre> rechercherEtEmprunterSiUnique(String nomUtilisateur, String prenomUtilisateur, String emailUtilisateur, String partieDuTitre) {
+
+        List<Livre> livresTrouves = rechercherLivre("titre", partieDuTitre);
+
+        if (livresTrouves.isEmpty()) {
+            System.out.println("Aucun livre trouvé avec le titre partiel : " + partieDuTitre);
+            return livresTrouves;
         }
-        return false;
+        
+        /*
+        if (livresTrouves.size() == 1) {
+            Livre livre = livresTrouves.get(0);
+            if (emprunterLivreDirect(nomUtilisateur, prenomUtilisateur, emailUtilisateur, livre)) {
+                System.out.println("Livre '" + livre.getTitre() + "' emprunté avec succès par " + nomUtilisateur + ".");
+            }
+            return livresTrouves;
+        }*/
+
+        return livresTrouves;
+    }
+    
+    public boolean emprunterLivreDirect(String nomUtilisateur, String prenomUtilisateur, String emailUtilisateur, Livre livre) {
+        if (!livre.isDisponible()) {
+            System.out.println("Le livre '" + livre.getTitre() + "' n'est pas disponible.");
+            return false;
+        }
+
+        utilisateurs.putIfAbsent(emailUtilisateur, new Utilisateur(nomUtilisateur, prenomUtilisateur, emailUtilisateur));
+        Utilisateur utilisateur = utilisateurs.get(emailUtilisateur);
+
+        if (!utilisateur.getEmprunts().contains(livre)) {
+            utilisateur.ajouterEmprunt(livre);
+            emprunts.put(livre, utilisateur);
+            livre.setDisponible(false);
+            System.out.println("Livre '" + livre.getTitre() + "' emprunté avec succès par " + utilisateur.getNom() + ".");
+            return true;
+        } else {
+            System.out.println("L'utilisateur a déjà emprunté ce livre.");
+            return false;
+        }
     }
     
     public boolean retournerLivre(String nomUtilisateur, String prenomUtilisateur, String emailUtilisateur, Livre livreUtilisateur) {

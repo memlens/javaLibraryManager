@@ -80,13 +80,27 @@ public class Main {
                     String prenom = scanner.nextLine();
                     System.out.print("Email utilisateur : ");
                     String email = scanner.nextLine();
-                    System.out.print("Titre du livre : ");
-                    String titre = scanner.nextLine();
-                    List<Livre> livres = service.rechercherLivre("titre", titre);
-                    if (!livres.isEmpty() && service.emprunterLivre(nom, prenom, email, livres.get(0))) {
-                        System.out.println("Livre emprunté avec succès !");
-                    } else {
-                        System.out.println("Livre indisponible ou introuvable.");
+                    System.out.print("Partie du titre du livre : ");
+                    String partieDuTitre = scanner.nextLine();
+
+                    List<Livre> livresTrouves = service.rechercherEtEmprunterSiUnique(nom, prenom, email, partieDuTitre);
+
+                    if (livresTrouves.size() > 0) {
+                        System.out.println("Veuillez choisir le livre : ");
+                        for (int i = 0; i < livresTrouves.size(); i++) {
+                            System.out.println((i + 1) + ". " + livresTrouves.get(i));
+                        }
+
+                        System.out.print("Choix : ");
+                        int choix_ = scanner.nextInt();
+                        scanner.nextLine();
+
+                        if (choix_ < 1 || choix_ > livresTrouves.size()) {
+                            System.out.println("Choix invalide.");
+                        } else {
+                            Livre livreChoisi = livresTrouves.get(choix_ - 1);
+                            service.emprunterLivreDirect(nom, prenom, email, livreChoisi);
+                        }
                     }
                 }
                 case 4 -> {

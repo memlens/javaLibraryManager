@@ -118,6 +118,21 @@ public class BibliothequeService {
     public Utilisateur getUtilisateurParEmail(String email) {
         return utilisateurs.get(email);
     }
+   
+    public boolean supprimerLivre(Livre livre) {
+        if (emprunts.containsKey(livre)) {
+            System.out.println("Le livre '" + livre.getTitre() + "' est actuellement emprunté et ne peut pas être supprimé.");
+            return false;
+        }
+
+        if (livres.remove(livre)) {
+            System.out.println("Le livre '" + livre.getTitre() + "' a été supprimé avec succès.");
+            return true;
+        } else {
+            System.out.println("Le livre '" + livre.getTitre() + "' n'a pas été trouvé dans la bibliothèque.");
+            return false;
+        }
+    }
     
     public void initialiserDonnees() {
         // Ajout de livres

@@ -23,7 +23,8 @@ public class Main {
             System.out.println("3. Emprunter un livre");
             System.out.println("4. Retourner un livre");
             System.out.println("5. Afficher les statistiques");
-            System.out.println("6. Quitter");
+            System.out.println("6. Supprimer un livre");
+            System.out.println("7. Quitter");
             System.out.print("Choix : ");
             int choix = 0;
             try {
@@ -80,7 +81,7 @@ public class Main {
                     String prenom = scanner.nextLine();
                     System.out.print("Email utilisateur : ");
                     String email = scanner.nextLine();
-                    System.out.print("Partie du titre du livre : ");
+                    System.out.print("Titre ou partie du titre du livre : ");
                     String partieDuTitre = scanner.nextLine();
 
                     List<Livre> livresTrouves = service.rechercherEtEmprunterSiUnique(nom, prenom, email, partieDuTitre);
@@ -124,6 +125,49 @@ public class Main {
                     afficherLivres(service.getLivresEmpruntes(), service.getEmprunts(), "Livres empruntés", ROUGE);
                 }
                 case 6 -> {
+                    System.out.print("Partie du titre du livre à supprimer (ou 'q' pour quitter) : ");
+                    String partieDuTitre = scanner.nextLine();
+
+                    if (partieDuTitre.equalsIgnoreCase("q")) {
+                        continue;
+                    }
+
+                    List<Livre> livresTrouves = service.rechercherLivre("titre", partieDuTitre);
+
+                    if (livresTrouves.isEmpty()) {
+                        System.out.println("Aucun livre trouvé avec le titre partiel : " + partieDuTitre);
+                        continue;
+                    }
+
+                    if (livresTrouves.size() == 1) {
+                        Livre livre = livresTrouves.get(0);
+                        service.supprimerLivre(livre);
+                        continue;
+                    }
+
+                    System.out.println("Plusieurs livres trouvés. Veuillez choisir un livre à supprimer :");
+                    for (int i = 0; i < livresTrouves.size(); i++) {
+                        System.out.println((i + 1) + ". " + livresTrouves.get(i));
+                    }
+                    System.out.println((livresTrouves.size() + 1) + ". Quitter");
+
+                    System.out.print("Choix : ");
+                    int choix__ = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (choix__ < 1 || choix__ > livresTrouves.size() + 1) {
+                        System.out.println("Choix invalide.");
+                        continue;
+                    }
+
+                    if (choix__ == livresTrouves.size() + 1) {
+                        continue;
+                    }
+
+                    Livre livreChoisi = livresTrouves.get(choix__ - 1);
+                    service.supprimerLivre(livreChoisi);
+                }
+                case 7 -> {
                     System.out.println("Au revoir !");
                     return;
                 }

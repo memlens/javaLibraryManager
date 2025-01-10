@@ -53,8 +53,17 @@ public class Main {
                     System.out.println("Livre ajouté !");
                 }
                 case 2 -> {
-                    System.out.print("Rechercher par (titre/auteur/genre) : ");
-                    String critere = scanner.nextLine();
+                    List<String> criteres = List.of("titre", "auteur", "genre");
+                    String critere;
+                    while (true) {
+                        System.out.print("Rechercher par (titre/auteur/genre) : ");
+                        critere = scanner.nextLine().toLowerCase();
+                        if (criteres.contains(critere)) {
+                            break;
+                        } else {
+                            System.out.println("Critère invalide. Veuillez choisir parmi : titre, auteur, genre.");
+                        }
+                    }
                     System.out.print("Valeur : ");
                     String valeur = scanner.nextLine();
                     List<Livre> resultats = service.rechercherLivre(critere, valeur);
